@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { useGetPatientDetailsByPatientId } from "../graphql/patients/datasource";
 import Logo from "../public/assets/logo.jpeg";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const [patientId, setPatientId] = useState("");
   const [showPage, setShowPage] = useState("Main");
   const [shake, setShake] = useState(false);
   const [error, setError] = useState("");
+  const [patientDetails, setPatientDetails] = useState(null);
+  const router = useRouter();
 
   const { refetch } = useGetPatientDetailsByPatientId(patientId?.toUpperCase());
 
@@ -25,10 +28,8 @@ export default function Home() {
       const result = await refetch();
 
       if (result?.data?.getPatientByPatientId) {
-        // Reservation ID exists, redirect to another page
-        // router.push(`/`);
         setShowPage("Confirm");
-        setUserData(result?.data?.getPatientByPatientId);
+        setPatientDetails(result?.data?.getPatientByPatientId);
       } else {
         setError("Reservation ID not found. Please try again.");
       }
@@ -44,24 +45,26 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto px-5 flex justify-center items-center h-screen">
-      <div className="w-full lg:w-[360px]">
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <div className="w-full lg:w-[400px] bg-white shadow-lg rounded-lg p-6">
         {showPage === "Main" ? (
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col gap-3 w-full mt-1 justify-center items-center"
+            className="flex flex-col gap-6 w-full justify-center items-center"
           >
-            <Image
-              src={Logo}
-              alt="logo"
-              width={1000}
-              height={1000}
-              className="w-20 h-20"
-            />
+            <div className="flex justify-center mb-6">
+              <Image
+                src={Logo}
+                alt="HealthBridge Logo"
+                width={1000}
+                height={1000}
+                className="w-16 h-16 object-contain"
+              />
+            </div>
 
-            <h4 className="font-bold text-3xl text-center">
-              Welcome <br />{" "}
-              <span className="font-semibold">to Healthbridge</span>
+            <h4 className="font-semibold text-3xl text-center text-gray-800">
+              Welcome to <br />
+              <span className="font-bold text-blue-600">HealthBridge</span>
             </h4>
 
             <div className="w-full">
@@ -70,12 +73,12 @@ export default function Home() {
                 onChange={(e) => setPatientId(e.target.value)}
                 type="text"
                 required
-                className={`mt-4 p-2 rounded-md font-semibold uppercase font-lato w-full  text-[#121212] border outline-none ${
+                className={`mt-4 p-4 rounded-md font-semibold uppercase text-gray-700 border outline-none shadow-sm w-full focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
                   error
-                    ? "border-red-500 border-2 animate-shake"
-                    : "border-blue-400"
+                    ? "border-red-500 animate-shake"
+                    : "border-gray-300 focus:border-blue-500"
                 }`}
-                placeholder="PATIENT ID"
+                placeholder="Enter Patient ID"
               />
               {error && (
                 <p className="text-red-500 font-semibold text-sm mt-2 animate-shake">
@@ -86,13 +89,37 @@ export default function Home() {
 
             <button
               type="submit"
-              className={` w-full rounded-lg bg-blue-400 text-white font-lato font-bold py-2`}
+              className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-all duration-300"
             >
               Submit
             </button>
           </form>
         ) : (
-          <></>
+          <div className="text-center">
+            <p className="font-poppins text-2xl text-gray-800">
+              Are you <br />
+              <span className="font-bold text-blue-600">
+                {patientDetails?.firstName} {patientDetails?.lastName}
+              </span>
+              ?
+            </p>
+            <div className="space-y-6 mt-8">
+              <button
+                onClick={() =>
+                  router.push(`/healthbridge/${patientDetails?.patientId}`)
+                }
+                className="w-72 mx-auto flex justify-center items-center text-base font-medium border border-blue-600 h-14 rounded-md hover:bg-blue-600 text-[#000000] transition-all duration-300"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setShowPage("Main")}
+                className="w-72 mx-auto flex justify-center items-center font-poppins text-base font-medium border border-blue-600 h-14 rounded-md hover:bg-blue-600 text-[#000000] transition-all duration-300"
+              >
+                No
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

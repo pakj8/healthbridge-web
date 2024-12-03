@@ -16,13 +16,13 @@ function Navbar() {
         />
 
         {/* Profile Icon */}
-        <Image
+        {/* <Image
           src={Profile}
           alt="Profile Icon"
           width={26}
           height={26}
           className="cursor-pointer ml-auto"
-        />
+        /> */}
       </div>
     </div>
   );
