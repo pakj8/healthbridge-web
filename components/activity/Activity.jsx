@@ -17,6 +17,7 @@ function Activity({ patientId }) {
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
       textColor: "text-blue-700",
+      onClick: () => router.push(`/healthbridge/consultation/`),
     },
     {
       title: "Raise a Complaint",
